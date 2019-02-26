@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat</title>
+    <style type="text/css">
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        body{
+            height: 1005px;
+            background: linear-gradient(to top left, #39ADDB, #2A3C57);
+            padding: 1px;
+            color: whitesmoke;
+            text-align: center;
+        }
+        .all-message{
+            width: 950px;
+            height: 550px;
+            border: 2px solid white;
+            margin: 0 auto;
+            margin-top: 50px;
+        }
+        #messForm{
+            display: inline-block;
+            padding: 20px;
+        }
+        input{
+            display: inline-block;
+        }
+        .btn:hover{
+            cursor: pointer;
+            background-color: red;
+        }
+        .c-red{
+            background-color: red;
+        }
+        .c-yellow{
+            background-color: yellow;
+        }
+        .c-green{
+            background-color: darkgreen;
+        }
+        .c-black{
+            background-color: black;
+        }
+        .c-orange{
+            background-color: orange;
+        }
+        .c-white{
+            background-color: whitesmoke;
+        }
+    </style>
+
+</head>
+<body>
+<br>
+<br>
+    <h2>Enter your name and go</h2>
+
+    <div class="all-message" id="all-mess"></div>
+
+<form id="messForm">
+    <label for="name"></label>
+    <input type="text" name="name" id="name" placeholder="Введите никнейм" class="form-control">
+    <br>
+    <label for="message"></label><br>
+    <textarea name="message" id="message" class="form-control" placeholder="Введите сообщение"></textarea>
+    <br><br>
+    <input type="submit" value="Отправить" class="btn btn-danger">
+</form>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    let min = 1;
+    let max = 6;
+    let random = Math.floor(Math.random()*(max - min)) + min;
+
+    let alertClass;
+    switch(random){
+        case 1:
+            alertClass = 'c-red';
+            break;
+	case 2:
+	    alertClass = 'c-yellow';
+	    break;
+	case 3:
+	    alertClass = 'c-green';
+	    break;
+	case 4:
+	    alertClass = 'c-black';
+	    break;
+	case 5:
+	    alertClass = 'c-orange';
+	    break;
+	case 6:
+	    alertClass = 'c-white';
+	    break;
+    }
+
+
+    $(function () {
+        let socket = io.connect();
+
+        let $form = $('#messForm');
+	let $name = $('#name');
+        let $textarea = $('#message');
+        let $all_messages = $('#all-mess');
+
+        $form.submit(function (e) {
+            e.preventDefault();
+            socket.emit('send mess', {mess: $textarea.val(), name: $name.val(), className: alertClass});
+            $textarea.val('');
+
+	    socket.on('add mess', function (data) {
+		$all_messages.append("<div class=" + data.className+ "  > <b>" + data.name + "</b>: " + data.mess + "</div>");
+	    })
+	});
+    });
+</script>
+</body>
+</html>
